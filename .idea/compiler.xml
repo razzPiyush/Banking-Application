@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="BackOfficeSystem" />
+        <module name="BankData" />
+        <module name="OnlineBanking" />
+        <module name="TransactionScheduling" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="BackOfficeSystem" options="-parameters" />
+      <module name="BankData" options="-parameters" />
+      <module name="OnlineBanking" options="-parameters" />
+      <module name="TransactionScheduling" options="-parameters" />
+    </option>
+  </component>
+</project>
