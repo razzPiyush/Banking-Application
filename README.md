@@ -22,7 +22,7 @@ Functionalities:
 
 ## Docker Image is available at the below location:
 
-https://hub.docker.com/repository/docker/saurabh05/banking-system-backend/general
+https://hub.docker.com/repository/docker/piyushr4/banking-system-backend/general
 
 
 ## If you want to see the data, then pgadmin support is already integrated into the images. Please follow the steps below to access the DB details on PgAdmin.
