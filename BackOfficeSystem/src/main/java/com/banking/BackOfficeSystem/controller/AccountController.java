@@ -16,6 +16,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
+// controller handles the request coming from the client
 
     @Autowired
     AccountDao accountDao;
@@ -26,6 +27,7 @@ public class AccountController {
 //    @Autowired
 //    SmsService smsService;
 
+    // koi bhi client se request aata hai to uska return me ResponseEntity(body, headers, http status) bhejte hai
     @GetMapping("/getAll")
     public ResponseEntity getAllAccounts() throws Exception {
         try {
