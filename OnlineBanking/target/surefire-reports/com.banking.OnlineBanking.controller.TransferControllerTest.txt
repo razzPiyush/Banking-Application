@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.banking.OnlineBanking.controller.TransferControllerTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.231 s <<< FAILURE! - in com.banking.OnlineBanking.controller.TransferControllerTest
+getTransactionList  Time elapsed: 0.005 s  <<< ERROR!
+java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.time.LocalDate java.time.LocalDateTime.date accessible: module java.base does not "opens java.time" to unnamed module @5e853265
+	at com.banking.OnlineBanking.controller.TransferControllerTest.getTransactionList(TransferControllerTest.java:157)
+

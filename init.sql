@@ -1,1 +1,1 @@
-CREATE DATABASE "hdfcbank1";
+CREATE DATABASE "baking_application";
