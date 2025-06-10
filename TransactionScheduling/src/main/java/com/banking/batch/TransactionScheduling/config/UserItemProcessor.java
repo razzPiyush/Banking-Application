@@ -12,7 +12,7 @@ import java.util.Date;
 public class UserItemProcessor implements ItemProcessor<Schedule, Schedule> {
 
     @Override
-    public Schedule process(Schedule schedule) throws Exception {
+    public Schedule process(@org.springframework.lang.NonNull Schedule schedule) throws Exception {
         try {
             if (isValidSchedule(schedule)) {
                 log.debug("Processing schedule: {}", schedule.getScheduleid());

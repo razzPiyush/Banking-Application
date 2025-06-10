@@ -23,11 +23,11 @@ public class UserSecurityService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.debug("Loading user by username: {}", username);
         
-        return customerDao.findByUserNameContainingIgnoreCase(username)
-            .map(CustomCustomerDetails::new)
-            .orElseThrow(() -> {
-                log.warn("Username {} not found", username);
-                return new UsernameNotFoundException("Username " + username + " not found");
-            });
+        Customer customer = customerDao.findByUserNameContainingIgnoreCase(username);
+        if (customer == null) {
+            log.warn("Username {} not found", username);
+            throw new UsernameNotFoundException("Username " + username + " not found");
+        }
+        return new CustomCustomerDetails(customer);
     }
 }

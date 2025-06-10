@@ -8,6 +8,7 @@ import com.common.BankData.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +42,7 @@ public class TransferController {
             return ResponseEntity.ok("Transfer completed successfully");
 
         } catch (Exception e) {
-            log.error("Transfer failed: {}", e.getMessage());
-            return ResponseEntity.internalServerError().body("Transfer failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Transfer failed: " + e.getMessage());
         }
     }
 
@@ -53,7 +53,7 @@ public class TransferController {
             return ResponseEntity.ok(new ArrayList<>(transactions));
         } catch (Exception e) {
             log.error("Error fetching transaction history for account {}: {}", accountId, e.getMessage());
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -67,7 +67,7 @@ public class TransferController {
             return ResponseEntity.ok(account);
         } catch (Exception e) {
             log.error("Error fetching balance for account {}: {}", accountId, e.getMessage());
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -81,7 +81,7 @@ public class TransferController {
             return ResponseEntity.ok(account.getBalance());
         } catch (Exception e) {
             log.error("Error fetching balance amount for account {}: {}", accountId, e.getMessage());
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

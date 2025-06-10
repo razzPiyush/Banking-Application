@@ -27,7 +27,7 @@ public class DBWriter implements ItemWriter<Schedule> {
 
     @Override
     @Transactional
-    public void write(List<? extends Schedule> schedules) throws Exception {
+    public void write(@org.springframework.lang.NonNull List<? extends Schedule> schedules) throws Exception {
         Date today = new Date();
         
         for (Schedule schedule : schedules) {

@@ -39,6 +39,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
             "FROM schedule";
 
     @Override
+    @org.springframework.lang.NonNull
     protected JobRepository createJobRepository() throws Exception {
         MapJobRepositoryFactoryBean factoryBean = new MapJobRepositoryFactoryBean();
         factoryBean.afterPropertiesSet();
@@ -81,7 +82,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
     private static class ScheduleRowMapper implements RowMapper<Schedule> {
         @Override
-        public Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public Schedule mapRow(@org.springframework.lang.NonNull ResultSet rs, int rowNum) throws SQLException {
             Schedule schedule = new Schedule();
             schedule.setScheduleid(rs.getInt("scheduleid"));
             schedule.setAccountId(rs.getLong("accountid"));
