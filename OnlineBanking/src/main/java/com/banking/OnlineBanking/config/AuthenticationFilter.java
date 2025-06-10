@@ -1,5 +1,6 @@
 package com.banking.OnlineBanking.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,33 +14,71 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 
+@Slf4j
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    AuthenticationFilter(final RequestMatcher requiresAuth) {
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String MISSING_TOKEN_MESSAGE = "Authorization token is missing";
+    private static final String INVALID_TOKEN_MESSAGE = "Invalid authorization token format";
+
+    public AuthenticationFilter(final RequestMatcher requiresAuth) {
         super(requiresAuth);
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
-
-        Optional tokenParam = Optional.ofNullable(httpServletRequest.getHeader("AUTHORIZATION")); //Authorization: Bearer TOKEN
-
-        if (!(tokenParam.isPresent())) {
-            throw new NullPointerException();
-
+    public Authentication attemptAuthentication(
+            HttpServletRequest request, 
+            HttpServletResponse response) throws AuthenticationException {
+        
+        try {
+            String token = extractToken(request);
+            return authenticateToken(token);
+        } catch (Exception e) {
+            log.error("Authentication failed: {}", e.getMessage());
+            throw new AuthenticationException(e.getMessage()) {};
         }
-        String token= httpServletRequest.getHeader("AUTHORIZATION");
-        token= StringUtils.removeStart(token, "Bearer").trim();
-        Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(token, token);
-        return getAuthenticationManager().authenticate(requestAuthentication);
-
     }
 
     @Override
-    protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain, final Authentication authResult) throws IOException, ServletException {
-        SecurityContextHolder.getContext().setAuthentication(authResult);
-        chain.doFilter(request, response);
+    protected void successfulAuthentication(
+            HttpServletRequest request, 
+            HttpServletResponse response, 
+            FilterChain chain, 
+            Authentication authResult) throws IOException, ServletException {
+        
+        try {
+            SecurityContextHolder.getContext().setAuthentication(authResult);
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            log.error("Error in authentication chain: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        
+        if (StringUtils.isBlank(authHeader)) {
+            log.warn("Missing authorization header");
+            throw new IllegalArgumentException(MISSING_TOKEN_MESSAGE);
+        }
+
+        if (!authHeader.startsWith(BEARER_PREFIX)) {
+            log.warn("Invalid authorization header format");
+            throw new IllegalArgumentException(INVALID_TOKEN_MESSAGE);
+        }
+
+        return authHeader.substring(BEARER_PREFIX.length()).trim();
+    }
+
+    private Authentication authenticateToken(String token) {
+        if (StringUtils.isBlank(token)) {
+            throw new IllegalArgumentException(INVALID_TOKEN_MESSAGE);
+        }
+
+        Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(token, token);
+        return getAuthenticationManager().authenticate(requestAuthentication);
     }
 }

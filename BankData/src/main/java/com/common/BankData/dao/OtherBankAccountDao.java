@@ -4,4 +4,7 @@ import com.common.BankData.entity.OtherAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OtherBankAccountDao extends JpaRepository<OtherAccount,Long> {
+    OtherAccount findByAccountId(long accountId);
+    OtherAccount findByAccountNumber(String accountNumber);
+    OtherAccount findByAccountName(String accountName);
 }

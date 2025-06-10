@@ -3,32 +3,40 @@ package com.banking.BackOfficeSystem.service;
 import com.common.BankData.dao.AdminDao;
 import com.common.BankData.entity.Admin;
 import com.common.BankData.entity.CustomAdminDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserSecurityService implements UserDetailsService {
 
-    /*
-     * The application logger
-     */
-    private static final Logger LOG = LoggerFactory.getLogger(UserSecurityService.class);
-
-    @Autowired
-    private AdminDao adminDao;
+    private static final String USER_NOT_FOUND_MESSAGE = "Username %s not found";
+    
+    private final AdminDao adminDao;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Admin user = adminDao.findByUserName(username);
-        if (user == null) {
-            LOG.warn("Username {} not found", username);
-            throw new UsernameNotFoundException("Username " + username + " not found");
+        try {
+            Admin admin = adminDao.findByUserName(username);
+            if (admin != null) {
+                return new CustomAdminDetails(admin);
+            } else {
+                throw createNotFoundException(username);
+            }
+        } catch (Exception e) {
+            log.error("Error loading user {}: {}", username, e.getMessage());
+            throw new UsernameNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, username), e);
         }
-        return new CustomAdminDetails(user);
+    }
+
+    private UsernameNotFoundException createNotFoundException(String username) {
+        String message = String.format(USER_NOT_FOUND_MESSAGE, username);
+        log.warn(message);
+        return new UsernameNotFoundException(message);
     }
 }

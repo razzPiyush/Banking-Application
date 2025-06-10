@@ -1,126 +1,52 @@
 package com.common.BankData.entity;
 
-
-
-
 import com.common.BankData.entity.security.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import javax.persistence.*;
-import javax.persistence.GeneratedValue;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Admin{
-
+@Getter
+@Setter
+@NoArgsConstructor
+public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long adminId;
 
-    @Column(name="adminName")
+    @Column(name = "admin_name")
     private String adminName;
-    private  String userName;
 
-    public Admin() {
+    @Column(name = "username", unique = true)
+    private String userName;
 
-    }
-
-    @OneToMany(cascade=CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name = "adminRole", joinColumns = @JoinColumn(name = "adminid"), inverseJoinColumns = @JoinColumn(name = "roleid"))
-    public List<Role> adminRole;
-
-//    @OneToMany(mappedBy = "admin", cascade=CascadeType.ALL,fetch = FetchType.EAGER)
-//    @JsonIgnore
-//    public List<AdminRole> adminRole;
+    @Column(name = "password_hash")
     private String passwordHash;
+
+    @Column(name = "bank_ifsc")
     private String bankIFSC;
-private String token;
-    public Admin(Admin o) {
-        this.adminId=o.adminId;
-        this.adminName=o.adminName;
-        this.adminRole=o.adminRole;
-        this.userName=o.userName;
-        this.bankIFSC=o.bankIFSC;
-        this.passwordHash=o.passwordHash;
-        this.token=o.token;
+
+    private String token;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "admin_roles",
+        joinColumns = @JoinColumn(name = "admin_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> adminRoles = new ArrayList<>();
+
+    public Admin(Admin other) {
+        this.adminId = other.adminId;
+        this.adminName = other.adminName;
+        this.adminRoles = other.adminRoles;
+        this.userName = other.userName;
+        this.bankIFSC = other.bankIFSC;
+        this.passwordHash = other.passwordHash;
+        this.token = other.token;
     }
-
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public long getAdminId() {
-        return adminId;
-    }
-
-    public void setAdminId(long adminId) {
-        this.adminId = adminId;
-    }
-
-    public String getAdminName() {
-        return adminName;
-    }
-
-    public List<Role> getAdminRole() {
-        return adminRole;
-    }
-
-    public void setAdminRole(List<Role> adminRole) {
-        this.adminRole = adminRole;
-    }
-
-    public void setAdminName(String adminName) {
-        this.adminName = adminName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-//    public Role getRole() {
-//        return role;
-//    }
-//
-//    public void setRole(Role role) {
-//        this.role = role;
-//    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public String getBankIFSC() {
-        return bankIFSC;
-    }
-
-    public void setBankIFSC(String bankIFSC) {
-        this.bankIFSC = bankIFSC;
-    }
-
-
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        Set<GrantedAuthority> authorities = new HashSet<>();
-//        adminRole.forEach(ur -> authorities.add(new Authority(ur.getRoleName())));
-//        return authorities;
-//    }
-
-
-
 }

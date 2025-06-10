@@ -1,144 +1,133 @@
 package com.common.BankData.service;
 
-
-import com.common.BankData.dao.AccountDao;
-import com.common.BankData.dao.OtherBankAccountDao;
-import com.common.BankData.dao.ScheduleDao;
-import com.common.BankData.dao.TransferDao;
-import com.common.BankData.entity.Account;
-import com.common.BankData.entity.OtherAccount;
-import com.common.BankData.entity.PrimaryTransaction;
-import com.common.BankData.entity.Schedule;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.common.BankData.dao.*;
+import com.common.BankData.entity.*;
+import com.common.BankData.exception.InsufficientFundsException;
+import com.common.BankData.exception.TransferException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-
-
-import javax.persistence.PersistenceUnit;
-import javax.transaction.TransactionScoped;
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class TransferService {
 
-    @Autowired
-    AccountDao accountDao;
-
-    @Autowired
-    OtherBankAccountDao otherBankAccountDao;
-    @Autowired
-    TransferDao transferDao;
-
-    @Autowired
-    ScheduleDao scheduleDao;
-
-
-
-
+    private final AccountDao accountDao;
+    private final OtherBankAccountDao otherBankAccountDao;
+    private final TransferDao transferDao;
+    private final ScheduleDao scheduleDao;
 
     @Transactional
-    public Boolean addMoneyToRecipient(Account recipientAccount, Account primaryAccount, double amount, PrimaryTransaction transaction) throws Exception {
-
-
+    public boolean addMoneyToRecipient(Account recipientAccount, Account primaryAccount, 
+            double amount, PrimaryTransaction transaction) {
+        
         try {
-            double moneyPresent = primaryAccount.getBalance() - amount;
-            if (moneyPresent > 0) {
-
-
-                recipientAccount.setBalance(recipientAccount.getBalance() + amount);
-                primaryAccount.setBalance(primaryAccount.getBalance() - amount);
-
-                accountDao.save(recipientAccount);
-                accountDao.save(primaryAccount);
-
-                Date d = new Date();
-                Instant instant = Instant.now();
-
-                LocalDateTime ld=LocalDateTime.now(Clock.systemUTC());
-
-                PrimaryTransaction pt = new PrimaryTransaction(d, transaction.getDescription(), "completed", transaction.getAmount(),
-                        transaction.getRecipientName(), transaction.getRecipientAccountNo(), transaction.getAccountId(),ld,transaction.getType());
-
-                transferDao.save(pt);
-                return true;
-
-            }
+            validateTransfer(primaryAccount, amount);
+            
+            executeTransfer(recipientAccount, primaryAccount, amount);
+            
+            createAndSaveTransaction(transaction);
+            
+            log.info("Transfer completed: {} to account {}", 
+                    amount, recipientAccount.getAccountId());
+            return true;
+            
+        } catch (InsufficientFundsException e) {
+            log.warn("Insufficient funds for transfer: {}", e.getMessage());
+            return false;
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            log.error("Transfer failed: {}", e.getMessage());
+            throw new TransferException("Transfer failed", e);
         }
-        return false;
     }
 
- @Transactional
-    public Boolean addMoneyToRecipientOfAnotherBank(OtherAccount recipientAccount, Account primaryAccount, double amount, PrimaryTransaction transaction) throws Exception {
-
-
+    @Transactional
+    public boolean addMoneyToRecipientOfAnotherBank(OtherAccount recipientAccount, 
+            Account primaryAccount, double amount, PrimaryTransaction transaction) {
+        
         try {
-            double moneyPresent = primaryAccount.getBalance() - amount;
-            if (moneyPresent > 0) {
-
-
-                recipientAccount.setBalance(recipientAccount.getBalance() + amount);
-                primaryAccount.setBalance(primaryAccount.getBalance() - amount);
-
-                otherBankAccountDao.save(recipientAccount);
-                accountDao.save(primaryAccount);
-
-                Date d = new Date();
-                Instant instant = Instant.now();
-
-                LocalDateTime ld=LocalDateTime.now(Clock.systemUTC());
-
-                PrimaryTransaction pt = new PrimaryTransaction(d, transaction.getDescription(), "completed", transaction.getAmount(),
-                        transaction.getRecipientName(), transaction.getRecipientAccountNo(), transaction.getAccountId(),ld,transaction.getType());
-
-                transferDao.save(pt);
-                return true;
-
-            }
+            validateTransfer(primaryAccount, amount);
+            
+            executeInterBankTransfer(recipientAccount, primaryAccount, amount);
+            
+            createAndSaveTransaction(transaction);
+            
+            log.info("Inter-bank transfer completed: {} to account {}", 
+                    amount, recipientAccount.getAccountId());
+            return true;
+            
+        } catch (InsufficientFundsException e) {
+            log.warn("Insufficient funds for inter-bank transfer: {}", e.getMessage());
+            return false;
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            log.error("Inter-bank transfer failed: {}", e.getMessage());
+            throw new TransferException("Inter-bank transfer failed", e);
         }
-        return false;
     }
 
+    @Transactional(readOnly = true)
     public Set<PrimaryTransaction> getTransactionHistoryByAccountID(long accountId) {
-        List<PrimaryTransaction> transactionList=new ArrayList<>();
-        Set<PrimaryTransaction> trans=new HashSet<>();
-        Set<PrimaryTransaction> trans1=new HashSet<>();
-        trans=transferDao.findByAccountId(accountId);
-        trans1=transferDao.findByRecipientAccountNo(accountId);
-        trans.addAll(trans1);
-
-//        transactionList=transferDao.findByAccountId(accountId);
-
-//        List<PrimaryTransaction> transactionList1=new ArrayList<>();
-//        transactionList=transferDao.findByRecipientAccountNo(accountId);
-//      //  transactionList.addAll(transactionList1);
-//
-//        Optional.ofNullable(transactionList1).ifPresent(transactionList::addAll);
-
-//        Collections.sort(trans, new Comparator<PrimaryTransaction>() {
-//            public int compare(PrimaryTransaction o1, PrimaryTransaction o2) {
-//                if (o1.getDate() == null || o2.getDate() == null)
-//                    return 0;
-//                return o1.getDate().compareTo(o2.getDate());
-//            }
-//        });
-
-        return trans;
-
-
-
+        Set<PrimaryTransaction> transactions = new HashSet<>();
+        transactions.addAll(transferDao.findByAccountId(accountId));
+        transactions.addAll(transferDao.findByRecipientAccountNo(accountId));
+        return transactions;
     }
 
+    @Transactional
+    public void deleteSchedule(Schedule schedule) {
+        try {
+            int deleted = scheduleDao.removeByScheduleid(schedule.getScheduleid());
+            if (deleted == 0) {
+                throw new TransferException("Schedule not found: " + schedule.getScheduleid());
+            }
+            log.info("Schedule deleted: {}", schedule.getScheduleid());
+        } catch (Exception e) {
+            log.error("Failed to delete schedule: {}", e.getMessage());
+            throw new TransferException("Failed to delete schedule", e);
+        }
+    }
 
-    public void deleteASchedule(Schedule sd) {
+    private void validateTransfer(Account primaryAccount, double amount) {
+        double balanceAfterTransfer = primaryAccount.getBalance() - amount;
+        if (balanceAfterTransfer <= 0) {
+            throw new InsufficientFundsException("Insufficient funds for transfer");
+        }
+    }
 
-       int a=scheduleDao.removeByScheduleid(sd.getScheduleid());
+    private void executeTransfer(Account recipientAccount, Account primaryAccount, double amount) {
+        recipientAccount.setBalance(recipientAccount.getBalance() + amount);
+        primaryAccount.setBalance(primaryAccount.getBalance() - amount);
+        
+        accountDao.save(recipientAccount);
+        accountDao.save(primaryAccount);
+    }
+
+    private void executeInterBankTransfer(OtherAccount recipientAccount, 
+            Account primaryAccount, double amount) {
+        recipientAccount.setBalance(recipientAccount.getBalance() + amount);
+        primaryAccount.setBalance(primaryAccount.getBalance() - amount);
+        
+        otherBankAccountDao.save(recipientAccount);
+        accountDao.save(primaryAccount);
+    }
+
+    private PrimaryTransaction createAndSaveTransaction(PrimaryTransaction transaction) {
+        PrimaryTransaction newTransaction = new PrimaryTransaction(
+            new Date(),
+            transaction.getDescription(),
+            "completed",
+            transaction.getAmount(),
+            transaction.getRecipientName(),
+            transaction.getRecipientAccountNo(),
+            transaction.getAccountId(),
+            LocalDateTime.now(Clock.systemUTC()),
+            transaction.getType()
+        );
+        return transferDao.save(newTransaction);
     }
 }

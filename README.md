@@ -1,115 +1,153 @@
-# BankingSystem-Backend-With-Docker-Support
+# Banking System Backend
 
-## Accounting System
+A comprehensive banking system built with microservices architecture and Docker support.
 
+## Table of Contents
+- [Technology Stack](#technology-stack)
+- [System Architecture](#system-architecture)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Module Overview](#module-overview)
+- [API Documentation](#api-documentation)
+- [Database](#database)
 
-Technology Used:
-Java, Spring, Spring Batch, Spring Security, PostgreSQL, Microservices, Maven, JUnit, Liquibase,Fast2SMS
+## Technology Stack
+- **Backend**: Java, Spring Boot
+- **Security**: Spring Security (Basic Auth + Token Based)
+- **Database**: PostgreSQL
+- **DevOps**: Docker, Maven
+- **Testing**: JUnit
+- **Other Tools**: Liquibase, Fast2SMS
+- **Architecture**: Microservices
 
+## System Architecture
+The system consists of 4 main modules:
+1. BackOffice System (Admin Portal)
+2. Online Banking (Customer Portal)
+3. Transaction Scheduling System
+4. BankData (Common Library)
 
-Functionalities:
+## Features
 
-⦁	Spring: Forms the Outline of Whole project.
+### BackOffice System (Port: 8080)
+- **Dual Role System**:
+  - Capturer: Creates and manages customer accounts
+  - Authorizer: Approves/declines account requests
+- **Account Management**
+- **Customer Verification**
+- **Admin Dashboard**
 
-⦁	Spring Security: Basic Authentication mechanism on login and Token Based Authentication for every subsequent call from the User Interface.
+### Online Banking System (Port: 8081)
+- Secure customer login
+- Account balance checking
+- Transaction history
+- Schedule future-dated transactions
+- Fund transfers
 
-⦁	Junit: Unit Testing and Integration Testing available for Online Customer System.
+### Transaction Scheduling System (Port: 8082)
+- Automated batch processing
+- Future-dated transaction handling
+- Cron job (40-second intervals)
+- Transaction logging
 
-⦁	Spring Batch: As there are scenarios where payments needs to be done on any scheduled date and multiple Transaction to be done in a single day(Eg. payment of Salaries), I have used Spring batch to ease up the Stress on the application environment.
+### BankData Module
+- Common functionality library
+- Shared data models
+- Database operations
+- Utility services
 
-⦁	Liquibase: Used for Managing database Entries.
+## Getting Started
 
+### Prerequisites
+- Java 11 or higher
+- Docker
+- PostgreSQL
+- Maven
 
-## Docker Image is available at the below location:
+### Installation
 
-https://hub.docker.com/repository/docker/piyushr4/banking-system-backend/general
-
-
-## If you want to see the data, then pgadmin support is already integrated into the images. Please follow the steps below to access the DB details on PgAdmin.
-
-PgAdmin is Accessible at http://localhost:5050 with the credentials:
-
-Email: test@gmail.com
-
-Password: 1234.
-
-To connect to pgDb use the below credentials after getting into PGAdmin:
-
-hostname: host.docker.internal
-
-port: 6543
-
-username: postgres
-
-db: postgres
-
-password: 1234
-
-docker-compose up --build
-1. BackOfficeSystem: http://localhost:8081
-
-2. OnlineBankingSystem: http://localhost:8082
-
-3. TransactionSchedulingSystem: http://localhost:8083
-
-4. PgAdmin: http://localhost:5050
-
-Working of Every Module:
-
-## Backoffice System:
-
-1.  Admin would have two roles -Capturer and Authoriser.
+1. Clone the repository:
 ```bash
-
-  a.  Capturer would be responsible for feeding the details of prospect customer into the System,
-      and change the Details of Customer whenever requested by the Authoriser.
-  
-  b.  Authoriser would be able to approve or decline the request of Account creation submitted
-      by the capturer. Once Approved, the Customer account will be created along with 
-      Unique Account Number and credentials for login would be sent to the Phone number of 
-      Account holder.If Authoriser Decline the Request providing the reason for 
-      Disapproval of account, it would be sent back to Capturer for getting the data updated.
-  
-  c.  Both the Capturer and Authhoriser would be able to login using their own crentials,
-      which needs to be manually entered into the database at this point of time.
-  
-  ```
- 
- ## BankData:
- 
- ```bash
- 1.   BankData is a jar which which is used in other three projects. 
- 
-      It contains the Common functionalities across the project and thus,  
-      
-      It can be used in all the project as a library.
-      
-      BankData is based on following DRY(Do not repeat Yourself) principle.
-  ```
-  
- ## OnlineBanking:
- 
- 1.   This Module is for Customer Facing Application. In this Customer would be able to perform many functions.Eg.
- 
-    a. Login into their own account using credentials received through SMS.
-    
-    b. Check the Balance on their Account.
-    
-    c. View Transaction History on all the Transaction Done till the current date.
-    
-    d. Schedule a Transaction(Future-Dated)
-    
- ## TransactionScheduling:
- 
-```
- 1.   This Module is a Spring Batch Application which runs in the background, 
- 
-      and process the future dated Transaction. There is a Cron Job running every 40 seconds
- 
-      which which the data which needs to be processed. It will complete the job and
-      
-      write the transaction log to the database.
+git clone https://github.com/yourusername/banking-system.git
 ```
 
+2. Build the project:
+```bash
+mvn clean install
+```
 
- Thank You!
+3. Start the services using Docker:
+```bash
+docker-compose up --build
+```
+
+### Access Points
+- BackOffice System: http://localhost:8080
+- Online Banking: http://localhost:8081
+- Transaction System: http://localhost:8082
+- PgAdmin: http://localhost:5050
+
+## Database Access (PgAdmin)
+
+### PgAdmin Credentials
+- URL: http://localhost:5050
+- Email: test@gmail.com
+- Password: 1234
+
+### Database Connection Details
+- Hostname: host.docker.internal
+- Port: 5432
+- Username: postgres
+- Database: banking_application
+- Password: 1234
+
+## Development
+
+### Building Modules
+```bash
+cd BackOfficeSystem
+mvn clean install
+
+cd ../OnlineBanking
+mvn clean install
+
+cd ../TransactionScheduling
+mvn clean install
+```
+
+### Running Tests
+```bash
+mvn test
+```
+
+### Docker Compose
+Services are orchestrated using docker-compose:
+```bash
+docker-compose up --build    # Start all services
+docker-compose down         # Stop all services
+```
+
+## Security
+- Basic Authentication for initial login
+- Token-based authentication for subsequent requests
+- Encrypted password storage
+- SMS-based credentials delivery
+
+## Documentation
+- API Documentation: `/swagger-ui.html`
+- Database Schema: `/documentation/schema.md`
+
+## Contributing
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Acknowledgments
+- Spring Framework team
+- PostgreSQL team
+- Docker team

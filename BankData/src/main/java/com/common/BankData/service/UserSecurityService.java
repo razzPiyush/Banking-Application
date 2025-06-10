@@ -1,33 +1,33 @@
 package com.common.BankData.service;
 
-
 import com.common.BankData.dao.CustomerDao;
 import com.common.BankData.entity.CustomCustomerDetails;
 import com.common.BankData.entity.Customer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserSecurityService implements UserDetailsService {
 
-	/** The application logger */
-	private static final Logger LOG = LoggerFactory.getLogger(UserSecurityService.class);
+    private final CustomerDao customerDao;
 
-	@Autowired
-	private CustomerDao customerDao;
-
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Customer user = customerDao.findByUserNameContainingIgnoreCase(username);
-		if (user == null) {
-			LOG.warn("Username {} not found", username);
-			throw new UsernameNotFoundException("Username " + username + " not found");
-		}
-		return new CustomCustomerDetails(user);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.debug("Loading user by username: {}", username);
+        
+        return customerDao.findByUserNameContainingIgnoreCase(username)
+            .map(CustomCustomerDetails::new)
+            .orElseThrow(() -> {
+                log.warn("Username {} not found", username);
+                return new UsernameNotFoundException("Username " + username + " not found");
+            });
+    }
 }

@@ -1,53 +1,33 @@
 package com.common.BankData.entity.security;
 
-
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import javax.persistence.*;
 
-//
-////@Entity
-////@Table
-//public class AdminRole {
-//   // @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-//    private long adminRoleId;
-//
-//    public AdminRole(Admin user, Role role) {
-//        this.admin = user;
-//        this.role = role;
-//    }
-//
-//
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "admin_id")
-//    private Admin admin;
-//
-//
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "role_id")
-//    private Role role;
-//
-//    public long getAdminRoleId() {
-//        return adminRoleId;
-//    }
-//
-//    public void setAdminRoleId(long adminRoleId) {
-//        this.adminRoleId = adminRoleId;
-//    }
-//
-//    public Admin getAdmin() {
-//        return admin;
-//    }
-//
-//    public void setAdmin(Admin admin) {
-//        this.admin = admin;
-//    }
-//
-//    public Role getRole() {
-//        return role;
-//    }
-//
-//    public void setRole(Role role) {
-//        this.role = role;
-//    }
-//}
+import com.common.BankData.entity.Admin;
+
+@Entity
+@Table(name = "admin_roles")
+@Getter
+@Setter
+@NoArgsConstructor
+public class AdminRole {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long adminRoleId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+    public AdminRole(Admin admin, Role role) {
+        this.admin = admin;
+        this.role = role;
+    }
+}

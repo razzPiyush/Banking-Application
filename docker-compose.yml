@@ -1,40 +1,84 @@
+version: '3.8'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app_container
+    container_name: banking_app
+    depends_on:
+      pgdb:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/banking_application
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-1234}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_JPA_SHOW_SQL=false
+      - SPRING_LIQUIBASE_ENABLED=true
+      - SPRING_LIQUIBASE_CHANGE_LOG=classpath:db/changelog/master.changelog.xml
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+      - BACKOFFICE_PORT=8080
+      - ONLINE_BANKING_PORT=8081
+      - TRANSACTION_PORT=8082
+    ports:
+      - "${BACKOFFICE_PORT:-8080}:8080"
+      - "${ONLINE_BANKING_PORT:-8081}:8081"
+      - "${TRANSACTION_PORT:-8082}:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - banking-network
+
+  pgdb:
+    container_name: banking_db
+    image: postgres:13.1-alpine
+    environment:
+      - POSTGRES_DB=banking_application
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-1234}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - banking-network
+
+  pgadmin:
+    container_name: banking_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@banking.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    ports:
+      - "5050:80"
     depends_on:
       - pgdb
-      - pgadmin
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/hdfcbank1
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=1234
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    ports:
-      - 8080:8080
-      - 8081:8081
-      - 8082:8082
-  pgdb:
-    container_name: pgdb
-    image: 'postgres:13.1-alpine'
-    ports:
-      - 6543:5432
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=1234
     volumes:
-      - database_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-  pgadmin:
-    container_name: pgadmin
-    image: 'dpage/pgadmin4'
-    ports:
-      - 5050:80
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=test@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=1234
+      - pgadmin_data:/var/lib/pgadmin
+    restart: unless-stopped
+    networks:
+      - banking-network
+
 volumes:
-  database_data:
+  postgres_data:
     driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  banking-network:
+    driver: bridge

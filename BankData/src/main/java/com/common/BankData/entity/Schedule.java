@@ -1,58 +1,45 @@
 package com.common.BankData.entity;
 
-import com.sun.istack.Nullable;
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import javax.persistence.*;
-import java.time.*;
 import java.util.Date;
 
-
-@Entity(name="schedule")
+@Entity(name = "schedule")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int scheduleid;
+
+    @Temporal(TemporalType.TIMESTAMP)
     private Date dates;
+
     private long recipientAccountNo;
     private String status;
-    private  String recipientName;
+    private String recipientName;
     private double amount;
-
-    private String schedule_type;
-
-    public String getSchedule_type() {
-        return schedule_type;
-    }
-
-    public void setSchedule_type(String schedule_type) {
-        this.schedule_type = schedule_type;
-    }
-
     private String type;
 
-    public Schedule() {
-    }
+    @Column(name = "schedule_type")
+    private String scheduleType;
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
     @Column(nullable = true)
     private long accountId;
 
-    public long getAccountId() {
-        return accountId;
-    }
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastProcessedDate;
 
-    public void setAccountId(long accountId) {
-        this.accountId = accountId;
-    }
-
-    public Schedule(int scheduleid, Date dates, long recipientAccountNo, String status, String recipientName, double amount, String type, long accountId) {
+    // Constructor for scheduled transactions
+    public Schedule(int scheduleid, Date dates, long recipientAccountNo, 
+                   String status, String recipientName, double amount, 
+                   String type, long accountId) {
         this.scheduleid = scheduleid;
         this.dates = dates;
         this.recipientAccountNo = recipientAccountNo;
@@ -61,65 +48,5 @@ public class Schedule {
         this.amount = amount;
         this.type = type;
         this.accountId = accountId;
-    }
-
-    public Date getDates() {
-        return dates;
-    }
-
-    public void setDates(Date dates) {
-        this.dates = dates;
-    }
-
-    public String getRecipientName() {
-        return recipientName;
-    }
-
-    public void setRecipientName(String recipientName) {
-        this.recipientName = recipientName;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-//    @ManyToOne
-//    ScheduleList scheduleList;
-//
-//    public ScheduleList getScheduleList() {
-//        return scheduleList;
-//    }
-//
-//    public void setScheduleList(ScheduleList scheduleList) {
-//        this.scheduleList = scheduleList;
-//    }
-
-
-    public int getScheduleid() {
-        return scheduleid;
-    }
-
-    public void setScheduleid(int scheduleid) {
-        this.scheduleid = scheduleid;
-    }
-
-    public long getRecipientAccountNo() {
-        return recipientAccountNo;
-    }
-
-    public void setRecipientAccountNo(long recipientAccountNo) {
-        this.recipientAccountNo = recipientAccountNo;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

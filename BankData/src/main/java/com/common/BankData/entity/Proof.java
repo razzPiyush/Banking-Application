@@ -1,87 +1,36 @@
 package com.common.BankData.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import net.bytebuddy.dynamic.loading.InjectionClassLoader;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Date;
 
-
 @Entity
-//@JsonIgnoreProperties(ignoreUnknown = true)
-public class Proof
-{
+@Getter
+@Setter
+@NoArgsConstructor
+public class Proof {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int proofId;
-    private long uuid;
-    private String passportNumber;
-    private String emailId;
-    private Date dob;
 
+    @Column(nullable = false, unique = true)
+    private long uuid;
+
+    @Column(unique = true)
+    private String passportNumber;
+
+    @Column(nullable = false)
+    private String emailId;
+
+    private Date dob;
+    private int age;
 
     @OneToOne(mappedBy = "proof")
     @JsonBackReference
     private Account acc;
-
-    public Account getAcc() {
-        return acc;
-    }
-
-    public void setAcc(Account acc) {
-        this.acc = acc;
-    }
-
-    private int age;
-
-    public int getProofId() {
-        return proofId;
-    }
-
-    public void setProofId(int proofId) {
-        this.proofId = proofId;
-    }
-
-    public long getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(long uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getPassportNumber() {
-        return passportNumber;
-    }
-
-    public void setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-    }
-
-    public String getEmailId() {
-        return emailId;
-    }
-
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
-    }
-
-    public Date getDob() {
-        return dob;
-    }
-
-    public void setDob(Date dob) {
-        this.dob = dob;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
 }

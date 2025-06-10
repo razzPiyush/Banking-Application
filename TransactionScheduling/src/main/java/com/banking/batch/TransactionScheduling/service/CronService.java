@@ -1,46 +1,50 @@
 package com.banking.batch.TransactionScheduling.service;
 
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CronService {
 
-    @Autowired
-    private JobLauncher jobLauncher;
+    private final JobLauncher jobLauncher;
+    private final Job loadJob;
 
-    @Autowired
-    Job loadJob;
+    private static final long FIXED_RATE = 60000; // 1 minute in milliseconds
 
-    @Scheduled(fixedRate = 60000)
-    public BatchStatus load() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+    @Scheduled(fixedRate = FIXED_RATE)
+    public BatchStatus load() {
+        try {
+            JobParameters parameters = createJobParameters();
+            JobExecution jobExecution = jobLauncher.run(loadJob, parameters);
+            
+            log.info("Batch job started at: {}", parameters.getParameters().get("time"));
+            
+            while (jobExecution.isRunning()) {
+                log.debug("Batch job is still running...");
+                Thread.sleep(1000);
+            }
+            
+            log.info("Batch job completed with status: {}", jobExecution.getStatus());
+            return jobExecution.getStatus();
 
-
-        Map<String, JobParameter> maps = new HashMap<>();
-        maps.put("time", new JobParameter(System.currentTimeMillis()));
-        JobParameters parameters = new JobParameters(maps);
-        JobExecution jobExecution = jobLauncher.run(loadJob, parameters);
-
-
-        System.out.println("Batch is Running...");
-        while (jobExecution.isRunning()) {
+        } catch (Exception e) {
+            log.error("Error executing batch job: {}", e.getMessage());
+            return BatchStatus.FAILED;
         }
-
-        return jobExecution.getStatus();
     }
 
-
+    private JobParameters createJobParameters() {
+        Map<String, JobParameter> params = new HashMap<>();
+        params.put("time", new JobParameter(System.currentTimeMillis()));
+        return new JobParameters(params);
+    }
 }

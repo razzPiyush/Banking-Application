@@ -1,54 +1,66 @@
 package com.banking.batch.TransactionScheduling.Controller;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
-@RequestMapping("/schedule")
+@RequestMapping("/api/scheduler")
+@RequiredArgsConstructor
 public class SchedulerController {
 
-    @Autowired
-    private JobLauncher jobLauncher;
+    private final JobLauncher jobLauncher;
+    private final Job loadJob;
 
-    @Autowired
-    Job loadJob;
-
-    @GetMapping("sf")
-    public String sf()
-    {
-        return "helo";
+    @GetMapping("/status")
+    public ResponseEntity<String> getStatus() {
+        return ResponseEntity.ok("Scheduler is running");
     }
 
-/*   @Autowired
-   Job exportUserJob ;*/
+    @GetMapping("/execute")
+    public ResponseEntity<BatchStatus> executeBatchJob() {
+        try {
+            JobParameters parameters = createJobParameters();
+            JobExecution jobExecution = jobLauncher.run(loadJob, parameters);
+            
+            log.info("Batch Job started with parameters: {}", parameters);
+            
+            while (jobExecution.isRunning()) {
+                log.debug("Batch job is still running...");
+                Thread.sleep(1000);
+            }
 
-//  @Scheduled(fixedRate = 20000)
-    @GetMapping("/hello")
-    public BatchStatus load() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+            log.info("Batch Job completed with status: {}", jobExecution.getStatus());
+            return ResponseEntity.ok(jobExecution.getStatus());
 
-
-        Map<String, JobParameter> maps = new HashMap<>();
-        maps.put("time", new JobParameter(System.currentTimeMillis()));
-        JobParameters parameters = new JobParameters(maps);
-        JobExecution jobExecution = jobLauncher.run(loadJob, parameters);
-
-
-
-        System.out.println("Batch is Running...");
-        while (jobExecution.isRunning()) {
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
 
-        return jobExecution.getStatus();
+    private JobParameters createJobParameters() {
+        Map<String, JobParameter> params = new HashMap<>();
+        params.put("time", new JobParameter(System.currentTimeMillis()));
+        return new JobParameters(params);
+    }
+
+    @Scheduled(cron = "${scheduler.cron.expression:0 0 * * * ?}")
+    public void scheduleJob() {
+        try {
+            executeBatchJob();
+        } catch (Exception e) {
+            log.error("Scheduled job failed: {}", e.getMessage());
+        }
     }
 }

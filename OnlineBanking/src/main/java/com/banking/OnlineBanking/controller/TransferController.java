@@ -1,77 +1,112 @@
 package com.banking.OnlineBanking.controller;
 
-
 import com.common.BankData.dao.AccountDao;
 import com.common.BankData.entity.Account;
 import com.common.BankData.entity.OtherAccount;
 import com.common.BankData.entity.PrimaryTransaction;
 import com.common.BankData.service.TransferService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/transfer")
+@RequiredArgsConstructor
 public class TransferController {
-    @Autowired
-    AccountDao accountDao;
 
-    @Autowired
-    TransferService transferService;
+    private final AccountDao accountDao;
+    private final TransferService transferService;
 
     @PostMapping("/betweenAccounts")
-    public ResponseEntity betweenAccounts(@RequestBody PrimaryTransaction transaction) throws Exception {
-        long recipient = transaction.getRecipientAccountNo();
-        Account recipientAccount = accountDao.findByAccountId(transaction.getRecipientAccountNo());
-        Account primaryAccount = accountDao.findByAccountId(transaction.getAccountId());
-        java.util.Date d = new Date();
-        if (recipientAccount != null) {
-            transferService.addMoneyToRecipient(recipientAccount, primaryAccount, transaction.getAmount(), transaction);
+    public ResponseEntity<String> betweenAccounts(@Validated @RequestBody PrimaryTransaction transaction) {
+        try {
+            Account recipientAccount = accountDao.findByAccountId(transaction.getRecipientAccountNo());
+            Account primaryAccount = accountDao.findByAccountId(transaction.getAccountId());
 
-        } else {
-            OtherAccount RecipientAccount = new OtherAccount(transaction.getAmount(), (java.sql.Date) d, recipient);
-            transferService.addMoneyToRecipientOfAnotherBank(RecipientAccount, primaryAccount, transaction.getAmount(), transaction);
-            return ResponseEntity.ok(HttpStatus.OK);
+            if (primaryAccount == null) {
+                return ResponseEntity.badRequest().body("Source account not found");
+            }
+
+            if (recipientAccount != null) {
+                processInternalTransfer(recipientAccount, primaryAccount, transaction);
+            } else {
+                processExternalTransfer(transaction, primaryAccount);
+            }
+
+            return ResponseEntity.ok("Transfer completed successfully");
+
+        } catch (Exception e) {
+            log.error("Transfer failed: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body("Transfer failed: " + e.getMessage());
         }
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/transactionHistory/{accountId}")
-    public ResponseEntity getTransactionList(@PathVariable long accountId) {
-
-        Set<PrimaryTransaction> pt = transferService.getTransactionHistoryByAccountID(accountId);
-        List<PrimaryTransaction> pp = new ArrayList<>();
-        for (PrimaryTransaction p : pt
-        ) {
-            pp.add(p);
+    public ResponseEntity<List<PrimaryTransaction>> getTransactionList(@PathVariable long accountId) {
+        try {
+            Set<PrimaryTransaction> transactions = transferService.getTransactionHistoryByAccountID(accountId);
+            return ResponseEntity.ok(new ArrayList<>(transactions));
+        } catch (Exception e) {
+            log.error("Error fetching transaction history for account {}: {}", accountId, e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
-
-        return ResponseEntity.ok(pp);
-
     }
 
-
     @GetMapping("/balance/{accountId}")
-    public ResponseEntity getBalance(@PathVariable long accountId) {
-
-        Account account = accountDao.findByAccountId(accountId);
-        return ResponseEntity.ok(account);
+    public ResponseEntity<Account> getBalance(@PathVariable long accountId) {
+        try {
+            Account account = accountDao.findByAccountId(accountId);
+            if (account == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(account);
+        } catch (Exception e) {
+            log.error("Error fetching balance for account {}: {}", accountId, e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/balanceAmountOnly/{accountId}")
-    public ResponseEntity balanceAmountOnly(@PathVariable long accountId) {
+    public ResponseEntity<Double> balanceAmountOnly(@PathVariable long accountId) {
+        try {
+            Account account = accountDao.findByAccountId(accountId);
+            if (account == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(account.getBalance());
+        } catch (Exception e) {
+            log.error("Error fetching balance amount for account {}: {}", accountId, e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
-        Account account = accountDao.findByAccountId(accountId);
-        return ResponseEntity.ok(account.getBalance());
+    private void processInternalTransfer(Account recipientAccount, Account primaryAccount, 
+                                       PrimaryTransaction transaction) {
+        transferService.addMoneyToRecipient(
+            recipientAccount, 
+            primaryAccount, 
+            transaction.getAmount(), 
+            transaction
+        );
+    }
+
+    private void processExternalTransfer(PrimaryTransaction transaction, Account primaryAccount) {
+        OtherAccount recipientAccount = new OtherAccount(
+            transaction.getAmount(),
+            new java.sql.Date(System.currentTimeMillis()),
+            transaction.getRecipientAccountNo()
+        );
+
+        transferService.addMoneyToRecipientOfAnotherBank(
+            recipientAccount,
+            primaryAccount,
+            transaction.getAmount(),
+            transaction
+        );
     }
 }

@@ -1,129 +1,63 @@
 package com.common.BankData.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
-import java.security.AccessControlContext;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Customer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long customerId;
+
+    @Column(name = "customer_name")
     private String customerName;
-//    private long accountId;
-    private  String userName;
+
+    @Column(name = "username", unique = true)
+    private String userName;
+
+    @Column(name = "password_hash")
     private String password;
 
+    @Column(name = "user_id")
     @ColumnDefault("0")
     private long userId;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customeridref")
-    private Set<Account> accounts;
+    @JoinColumn(name = "customer_id")
+    private Set<Account> accounts = new HashSet<>();
 
     private String token;
 
-    public Customer(final Customer o) {
-        this.customerId=o.customerId;
-        this.customerName=o.customerName;
-        this.userName=o.userName;
-        this.password=o.password;
-        this.token=o.token;
-      //  this.accountId=o.accountId;
-        this.accounts=o.accounts;
-
-
-
+    // Copy constructor
+    public Customer(final Customer other) {
+        this.customerId = other.customerId;
+        this.customerName = other.customerName;
+        this.userName = other.userName;
+        this.password = other.password;
+        this.token = other.token;
+        this.accounts = other.accounts;
+        this.userId = other.userId;
     }
 
-
-    public Customer() {
-    }
-
-    public Customer(long customerId, String customerName, String userName, String password, Set<Account> accounts, String token,long userId) {
-        this.customerId = customerId;
+    // Constructor for new customer creation
+    public Customer(String customerName, String userName, String password, Set<Account> accounts, String token, long userId) {
         this.customerName = customerName;
         this.userName = userName;
         this.password = password;
         this.accounts = accounts;
         this.token = token;
         this.userId = userId;
-    }
-    //this constructor is used to create a new Customer, when the account of that particular user is approved
-    public Customer(String customerName, String userName, String password, Set<Account> accounts, String token,long userId) {
-        this.customerName = customerName;
-        this.userName = userName;
-        this.password = password;
-        this.accounts = accounts;
-        this.token = token;
-        this.userId=userId;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUser_id(long userId) {
-        this.userId = userId;
-    }
-
-    public long getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(long customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-//    public long getAccountId() {
-//        return accountId;
-//    }
-//
-//    public void setAccountId(long accountId) {
-//        this.accountId = accountId;
-//    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Set<Account> getAccounts() {
-        return accounts;
-    }
-
-    public void setAccounts(Set<Account> accounts) {
-        this.accounts = accounts;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 }

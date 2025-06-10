@@ -1,40 +1,26 @@
 package com.common.BankData.entity.security;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "roles")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long roleId;
+    private Long roleId;
 
-    private String RoleName;
+    @Column(name = "role_name", nullable = false, unique = true)
+    private String roleName;
 
-
-    public Role() {
-
-    }
-
-
-//    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private Set<AdminRole> userRoles = new HashSet<>();
-
-    public long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(long roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getRoleName() {
-        return RoleName;
-    }
-
-    public void setRoleName(String roleName) {
-        RoleName = roleName;
-    }
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<AdminRole> adminRoles = new HashSet<>();
 }
