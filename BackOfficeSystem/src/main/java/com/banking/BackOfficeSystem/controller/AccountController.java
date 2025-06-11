@@ -5,6 +5,7 @@ import com.common.BankData.dao.CustomerDao;
 import com.common.BankData.entity.Account;
 import com.common.BankData.entity.Customer;
 import com.common.BankData.service.SmsService;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.*;
 @Slf4j
 @RestController
 @RequestMapping("/accounts")
+@CrossOrigin(origins = "*")
 public class AccountController {
 
     @Autowired
@@ -24,7 +26,7 @@ public class AccountController {
     @Autowired
     private CustomerDao customerDao;
 
-    @Autowired
+    @Autowired(required = false)
     private SmsService smsService;
 
     @GetMapping("/getAll")
@@ -114,7 +116,7 @@ public class AccountController {
     private void createCustomerAndSendCredentials(Account account) {
         try {
             long customerId = customerDao.getNextCustomerId();
-            String password = new String(SmsService.generatePassword(10));
+            String password = generatePassword(10);
 
             Set<Account> accountSet = new HashSet<>();
             accountSet.add(account);
@@ -129,10 +131,38 @@ public class AccountController {
             );
 
             customerDao.save(customer);
-            smsService.sendSms(customerId, String.valueOf(account.getPhoneNo()), password);
+            smsService.sendSms(String.valueOf(account.getPhoneNo()), password);
         } catch (Exception e) {
             log.error("Error creating customer for account {}: ", account.getId(), e);
             throw e;
         }
+    }
+
+    private String generatePassword(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$";
+        StringBuilder password = new StringBuilder();
+        Random rnd = new Random();
+        
+        // Ensure at least one of each required character type
+        password.append(chars.charAt(rnd.nextInt(26))); // Uppercase
+        password.append(chars.charAt(26 + rnd.nextInt(26))); // Lowercase
+        password.append(chars.charAt(52 + rnd.nextInt(10))); // Number
+        password.append(chars.charAt(62 + rnd.nextInt(4))); // Special char
+
+        // Fill the rest randomly
+        for (int i = 4; i < length; i++) {
+            password.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+
+        // Shuffle the password
+        char[] passwordArray = password.toString().toCharArray();
+        for (int i = passwordArray.length - 1; i > 0; i--) {
+            int j = rnd.nextInt(i + 1);
+            char temp = passwordArray[i];
+            passwordArray[i] = passwordArray[j];
+            passwordArray[j] = temp;
+        }
+
+        return new String(passwordArray);
     }
 }
