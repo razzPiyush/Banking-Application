@@ -3,16 +3,11 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <!-- Track database changes -->
-    <property name="now" value="now()" dbms="postgresql"/>
-    
-    <!-- Schema Changes -->
-    <include file="schema/001-create-tables.xml" relativeToChangelogFile="true"/>
-    <include file="schema/002-alter-tables.xml" relativeToChangelogFile="true"/>
-    
-    <!-- Data Changes -->
-    <include file="data/001-initial-data.xml" relativeToChangelogFile="true"/>
-    <include file="data/002-test-data.xml" relativeToChangelogFile="true" context="development"/>
+    <include file="db/changelog/schema/001-create-tables.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/schema/002-alter-tables.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/data/001-initial-data.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/data/002-test-data.xml" relativeToChangelogFile="false"/>
+
 </databaseChangeLog>
