@@ -1,1 +1,1 @@
-CREATE DATABASE "baking_application";
+CREATE DATABASE "zen_bank";

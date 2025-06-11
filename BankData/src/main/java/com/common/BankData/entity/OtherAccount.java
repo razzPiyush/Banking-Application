@@ -19,6 +19,9 @@ public class OtherAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "account_name")
+    private String accountName;
+
     private String bankIfsc;
     private String firstName;
     private String lastName;
@@ -38,12 +41,4 @@ public class OtherAccount {
 
     @Column(nullable = true)
     private long accountId;
-
-    private String remarks;
-
-    public OtherAccount(double balance, Date date, long accountId) {
-        this.balance = balance;
-        this.date = date;
-        this.accountId = accountId;
-    }
 }
