@@ -9,7 +9,7 @@
     </parent>
     <artifactId>CustomerOnlineBanking</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>OnlineBanking</name>
+    <name>CustomerOnlineBanking</name>
     <description>Demo project for Spring Boot</description>
     <packaging>jar</packaging>
 

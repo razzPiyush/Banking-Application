@@ -22,14 +22,14 @@ A comprehensive banking system built with microservices architecture and Docker 
 
 ## System Architecture
 The system consists of 4 main modules:
-1. BackOffice System (Admin Portal)
-2. Online Banking (Customer Portal)
+1. BankOffice System (Admin Portal)
+2. Customer Online Banking (Customer Portal)
 3. Transaction Scheduling System
 4. BankData (Common Library)
 
 ## Features
 
-### BackOffice System (Port: 8080)
+### BankOffice System (Port: 8080)
 - **Dual Role System**:
   - Capturer: Creates and manages customer accounts
   - Authorizer: Approves/declines account requests
@@ -37,7 +37,7 @@ The system consists of 4 main modules:
 - **Customer Verification**
 - **Admin Dashboard**
 
-### Online Banking System (Port: 8081)
+### Customer Online Banking System (Port: 8081)
 - Secure customer login
 - Account balance checking
 - Transaction history

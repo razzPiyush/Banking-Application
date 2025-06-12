@@ -10,7 +10,7 @@
     </parent>
     <artifactId>BankOfficeSystem</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>BackOfficeSystem</name>
+    <name>BankOfficeSystem</name>
     <description>Demo project for Spring Boot</description>
     <packaging>jar</packaging>
     <properties>
