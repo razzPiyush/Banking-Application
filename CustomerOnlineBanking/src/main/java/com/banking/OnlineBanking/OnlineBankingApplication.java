@@ -39,9 +39,9 @@ public class OnlineBankingApplication {
     public static void main(String[] args) {
         try {
             SpringApplication.run(OnlineBankingApplication.class, args);
-            log.info("Online Banking Application started successfully");
+            log.info("Customer Online Banking Application started successfully");
         } catch (Exception e) {
-            log.error("Failed to start Online Banking Application: {}", e.getMessage());
+            log.error("Failed to start Customer Online Banking Application: {}", e.getMessage());
             System.exit(1);
         }
     }

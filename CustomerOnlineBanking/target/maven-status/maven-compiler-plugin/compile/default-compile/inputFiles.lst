@@ -1,7 +1,7 @@
-/Users/piyushraj/Desktop/Java/Banking-Application/OnlineBanking/src/main/java/com/banking/OnlineBanking/controller/CustomerController.java
-/Users/piyushraj/Desktop/Java/Banking-Application/OnlineBanking/src/main/java/com/banking/OnlineBanking/OnlineBankingApplication.java
-/Users/piyushraj/Desktop/Java/Banking-Application/OnlineBanking/src/main/java/com/banking/OnlineBanking/config/SecurityConfig.java
-/Users/piyushraj/Desktop/Java/Banking-Application/OnlineBanking/src/main/java/com/banking/OnlineBanking/config/AuthenticationFilter.java
-/Users/piyushraj/Desktop/Java/Banking-Application/OnlineBanking/src/main/java/com/banking/OnlineBanking/controller/CustomerLoginController.java
-/Users/piyushraj/Desktop/Java/Banking-Application/OnlineBanking/src/main/java/com/banking/OnlineBanking/config/RequestFilter.java
-/Users/piyushraj/Desktop/Java/Banking-Application/OnlineBanking/src/main/java/com/banking/OnlineBanking/controller/TransferController.java
+/Users/piyushraj/Desktop/Java/Banking-Application/CustomerOnlineBanking/src/main/java/com/banking/OnlineBanking/OnlineBankingApplication.java
+/Users/piyushraj/Desktop/Java/Banking-Application/CustomerOnlineBanking/src/main/java/com/banking/OnlineBanking/config/AuthenticationFilter.java
+/Users/piyushraj/Desktop/Java/Banking-Application/CustomerOnlineBanking/src/main/java/com/banking/OnlineBanking/controller/CustomerLoginController.java
+/Users/piyushraj/Desktop/Java/Banking-Application/CustomerOnlineBanking/src/main/java/com/banking/OnlineBanking/config/RequestFilter.java
+/Users/piyushraj/Desktop/Java/Banking-Application/CustomerOnlineBanking/src/main/java/com/banking/OnlineBanking/config/SecurityConfig.java
+/Users/piyushraj/Desktop/Java/Banking-Application/CustomerOnlineBanking/src/main/java/com/banking/OnlineBanking/controller/TransferController.java
+/Users/piyushraj/Desktop/Java/Banking-Application/CustomerOnlineBanking/src/main/java/com/banking/OnlineBanking/controller/CustomerController.java
