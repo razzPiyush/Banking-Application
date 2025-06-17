@@ -33,6 +33,9 @@ public class CustomerController {
         }
     }
 
+    /**
+     * Process multiple schedules from the provided list
+     */
     private void processSchedules(ScheduleList scheduleList) {
         for (Schedule schedule : scheduleList.getSchedule()) {
             try {
@@ -43,6 +46,9 @@ public class CustomerController {
         }
     }
 
+    /**
+     * Validates and saves a single schedule entry
+     */
     private void validateAndSaveSchedule(Schedule schedule) {
         if (isValidSchedule(schedule)) {
             schedule.setStatus("scheduled");
@@ -53,6 +59,9 @@ public class CustomerController {
         }
     }
 
+    /**
+     * Checks if schedule has valid account IDs and positive amount
+     */
     private boolean isValidSchedule(Schedule schedule) {
         return schedule != null 
             && schedule.getAccountId() != 0 

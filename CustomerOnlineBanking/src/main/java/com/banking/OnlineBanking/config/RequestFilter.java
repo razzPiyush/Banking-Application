@@ -17,9 +17,9 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestFilter implements Filter {
 
-    private static final String BACKOFFICE_URL = "http://localhost:4200";
-    private static final String ONLINEBANKING_URL = "http://localhost:4201";
-    private static final List<String> ALLOWED_ORIGINS = Arrays.asList(BACKOFFICE_URL, ONLINEBANKING_URL);
+    private static final String BANKOFFICE_URL = "http://localhost:8000";
+    private static final String ONLINEBANKING_URL = "http://localhost:8001";
+    private static final List<String> ALLOWED_ORIGINS = Arrays.asList(BANKOFFICE_URL, ONLINEBANKING_URL);
     
     private static final String ALLOWED_METHODS = "POST, PUT, GET, OPTIONS, DELETE";
     private static final String ALLOWED_HEADERS = "Authorization, Content-Type, Accept, Origin, X-Requested-With";

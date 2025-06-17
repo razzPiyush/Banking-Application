@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+/**
+ * Controller handling bank account transfers and transaction history
+ */
 @Slf4j
 @RestController
 @RequestMapping("/transfer")
@@ -23,6 +26,9 @@ public class TransferController {
     private final AccountDao accountDao;
     private final TransferService transferService;
 
+    /**
+     * Handles transfers between accounts (internal and external)
+     */
     @PostMapping("/betweenAccounts")
     public ResponseEntity<String> betweenAccounts(@Validated @RequestBody PrimaryTransaction transaction) {
         try {
@@ -46,6 +52,9 @@ public class TransferController {
         }
     }
 
+    /**
+     * Retrieves transaction history for a specific account
+     */
     @GetMapping("/transactionHistory/{accountId}")
     public ResponseEntity<List<PrimaryTransaction>> getTransactionList(@PathVariable long accountId) {
         try {

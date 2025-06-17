@@ -29,6 +29,10 @@ public class AccountController {
     @Autowired(required = false)
     private SmsService smsService;
 
+    /**
+     * Retrieves all accounts
+     * @return List of accounts
+     */
     @GetMapping("/getAll")
     public ResponseEntity<List<Account>> getAllAccounts() {
         try {
@@ -43,6 +47,11 @@ public class AccountController {
         }
     }
 
+    /**
+     * Creates a new account
+     * @param account Account object containing account details
+     * @return Created account
+     */
     @PostMapping("/add")
     public ResponseEntity<Account> addAccount(@RequestBody Account account) {
         try {
@@ -54,6 +63,11 @@ public class AccountController {
         }
     }
 
+    /**
+     * Retrieves account by ID
+     * @param id Account ID
+     * @return Account object
+     */
     @GetMapping("/getById/{id}")
     public ResponseEntity<Account> getById(@PathVariable Long id) {
         try {
@@ -66,6 +80,12 @@ public class AccountController {
         }
     }
 
+    /**
+     * Updates an existing account
+     * @param account Account object containing updated details
+     * @param id Account ID
+     * @return Updated account
+     */
     @PutMapping("/update/{id}")
     public ResponseEntity<Account> updateAccount(@RequestBody Account account, @PathVariable long id) {
         try {
@@ -89,6 +109,10 @@ public class AccountController {
         }
     }
 
+    /**
+     * Retrieves all accounts with specified status
+     * @param status Account status code to filter by
+     */
     @GetMapping("/getAllByStatus/{status}")
     public ResponseEntity<List<Account>> getAllByStatus(@PathVariable int status) {
         try {
@@ -103,6 +127,9 @@ public class AccountController {
         }
     }
 
+    /**
+     * Generates unique account ID and sets initial status
+     */
     private void generateNewAccountId(Account account) {
         long accountId;
         do {
@@ -113,6 +140,9 @@ public class AccountController {
         account.setAccountStatus(3);
     }
 
+    /**
+     * Creates customer profile and sends login credentials
+     */
     private void createCustomerAndSendCredentials(Account account) {
         try {
             long customerId = customerDao.getNextCustomerId();
