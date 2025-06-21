@@ -11,7 +11,7 @@ services:
         condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/banking_application
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/zen_bank
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME:-postgres}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-1234}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate

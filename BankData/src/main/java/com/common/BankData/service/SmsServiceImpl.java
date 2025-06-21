@@ -57,7 +57,7 @@ public class SmsServiceImpl implements SmsService {
     private String sendHttpRequest(String urlString) throws Exception {
         URL url = new java.net.URI(urlString).toURL();
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+        conn.setRequestMethod("POST");
         conn.setRequestProperty("User-Agent", "Mozilla/5.0");
         conn.setRequestProperty("cache-control", "no-cache");
 
