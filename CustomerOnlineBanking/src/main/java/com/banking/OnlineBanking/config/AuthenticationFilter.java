@@ -15,6 +15,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/*
+The AuthenticationFilter.java file defines a custom authentication filter for Spring Security setup. Its main role is to:
+
+- Intercept HTTP requests that require authentication.
+- Extract the JWT or Bearer token from the Authorization header.
+- Validate and authenticate the token using Spring Security's authentication manager.
+- Set the authentication in the security context if successful, allowing the request to proceed.
+- Reject requests with missing or invalid tokens.
+
+In summary, this filter ensures that only requests with valid authentication tokens can access protected resources in your banking application.
+*/
 @Slf4j
 public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 

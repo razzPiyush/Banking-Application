@@ -20,6 +20,23 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+/*
+The SecurityConfig.java file defines the main Spring Security configuration for your banking application. Its main role is to:
+
+- Configure which URLs are public and which require authentication.
+- Register a custom authentication provider for validating user credentials.
+- Register the custom AuthenticationFilter to handle JWT/Bearer token authentication for protected endpoints.
+- Enforce stateless session management (no server-side sessions).
+- Disable CSRF, form login, HTTP Basic, and logout for API security.
+- Set up password encoding using BCrypt for secure password storage.
+
+In summary, this configuration ensures that only authenticated users with valid tokens can access protected resources, while allowing public access to specified endpoints, and applies best practices for securing RESTful APIs.
+*/
+/*
+- SecurityConfig.java secures endpoints and manages authentication/authorization.
+- RequestFilter.java manages cross-origin access and CORS headers for frontend-backend communication.  
+They work together to secure your application at different layers: one for authentication/authorization, the other for cross-origin request handling.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableJpaRepositories(basePackageClasses = CustomerDao.class)

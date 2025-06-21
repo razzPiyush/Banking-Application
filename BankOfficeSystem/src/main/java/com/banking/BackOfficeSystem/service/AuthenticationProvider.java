@@ -14,6 +14,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.apache.commons.lang3.StringUtils;
 
+/*
+AuthenticationProvider.java:
+- Custom Spring Security authentication provider for admin users.
+- Authenticates requests using a token (not username/password).
+- On authentication, extracts the token from the request, finds the admin in the database using AdminDao, and returns user details if valid.
+- Throws authentication exceptions if the token is missing, invalid, or the admin is not found.
+- Used by Spring Security to secure protected endpoints, ensuring only valid admins with correct tokens can access admin resources.
+*/
+
 @Slf4j
 @Component
 public class AuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {

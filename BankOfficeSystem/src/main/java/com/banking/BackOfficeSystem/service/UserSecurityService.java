@@ -10,6 +10,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/*
+UserSecurityService.java:
+- Implements Spring Security's UserDetailsService for admin authentication.
+- Loads admin user details from the database using the provided username.
+- Returns a CustomAdminDetails object if the admin exists, otherwise throws UsernameNotFoundException.
+- Used by Spring Security during authentication to fetch user details for login and authorization checks.
+*/
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

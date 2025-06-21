@@ -168,6 +168,15 @@ public class AccountController {
         }
     }
 
+    /**
+     * Generates a random password of the specified length with the following rules:
+     * - Ensures at least one uppercase letter, one lowercase letter, one digit, and one special character.
+     * - Fills the remaining characters randomly from all allowed characters.
+     * - Shuffles the result to randomize character positions.
+     * 
+     * @param length Desired password length
+     * @return Generated password string
+     */
     private String generatePassword(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$";
         StringBuilder password = new StringBuilder();

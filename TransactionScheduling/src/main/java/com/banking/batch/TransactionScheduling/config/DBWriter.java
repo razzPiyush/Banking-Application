@@ -16,6 +16,29 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 
+/*
+ * DBWRITER WORKFLOW
+ * ================
+ * 1. Input: Receives batch of scheduled transactions
+ * 2. Process Flow:
+ *    → Check if schedule is due today
+ *    → Verify accounts exist (sender & receiver)
+ *    → Create transaction record
+ *    → Execute money transfer
+ *    → Update schedule status
+ * 
+ * 3. Key Methods:
+ *    - write(): Entry point, processes batch of schedules
+ *    - processSchedule(): Handles single schedule
+ *    - executeTransfer(): Performs money transfer
+ *    - completeSchedule(): Marks success
+ *    - markScheduleFailed(): Marks failure
+ * 
+ * 4. Error Handling:
+ *    - Transaction rollback on failure
+ *    - Logging at each step
+ *    - Failed schedules marked for retry
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

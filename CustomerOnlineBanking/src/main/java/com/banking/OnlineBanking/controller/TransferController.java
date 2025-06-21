@@ -2,7 +2,7 @@ package com.banking.OnlineBanking.controller;
 
 import com.common.BankData.dao.AccountDao;
 import com.common.BankData.entity.Account;
-//import com.common.BankData.entity.OtherAccount;
+import com.common.BankData.entity.OtherAccount;
 import com.common.BankData.entity.PrimaryTransaction;
 import com.common.BankData.service.TransferService;
 import lombok.RequiredArgsConstructor;
@@ -105,17 +105,16 @@ public class TransferController {
     }
 
     private void processExternalTransfer(PrimaryTransaction transaction, Account primaryAccount) {
-        // OtherAccount recipientAccount = new OtherAccount(
-        //     transaction.getAmount(),
-        //     new java.sql.Date(System.currentTimeMillis()),
-        //     transaction.getRecipientAccountNo()
-        // );
+        OtherAccount recipientAccount = new OtherAccount();
+        recipientAccount.setBalance(transaction.getAmount());
+        recipientAccount.setDate(new java.sql.Date(System.currentTimeMillis()));
+        recipientAccount.setAccountId(transaction.getRecipientAccountNo());
 
-        // transferService.addMoneyToRecipientOfAnotherBank(
-        //     recipientAccount,
-        //     primaryAccount,
-        //     transaction.getAmount(),
-        //     transaction
-        // );
+        transferService.addMoneyToRecipientOfAnotherBank(
+            recipientAccount,
+            primaryAccount,
+            transaction.getAmount(),
+            transaction
+        );
     }
 }

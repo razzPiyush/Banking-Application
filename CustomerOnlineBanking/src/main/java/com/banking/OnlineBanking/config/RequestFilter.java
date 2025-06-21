@@ -12,6 +12,20 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+The RequestFilter.java file defines a custom servlet filter for handling CORS (Cross-Origin Resource Sharing) in application.
+Its main role is to:
+
+- Allow HTTP requests from specific origins (e.g., your banking frontends).
+- Set CORS headers to enable cross-origin requests from allowed domains.
+- Handle pre-flight OPTIONS requests required by browsers for CORS.
+- Restrict HTTP methods and headers to those specified.
+- Log allowed origins and filter lifecycle events.
+- Return appropriate responses for pre-flight and error scenarios.
+
+In summary, this filter ensures that only requests from trusted origins can interact with your APIs, enabling secure cross-origin communication
+for banking application.
+*/
 @Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
